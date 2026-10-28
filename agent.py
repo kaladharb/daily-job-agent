@@ -130,6 +130,36 @@ def fetch_lever():
         except (requests.RequestException, ValueError) as exc:
             print(f"Lever {company} unavailable: {exc}")
 
+def fetch_ashby():
+    with open("ashby_sources.json", "r", encoding="utf-8") as file:
+        sources = json.load(file)
+
+    for company in sources.get("ashby", []):
+        try:
+            url = f"https://api.ashbyhq.com/posting-api/job-board/{company}"
+            response = requests.get(url, timeout=TIMEOUT)
+            response.raise_for_status()
+
+            for item in response.json().get("jobs", []):
+                if not item.get("isListed", True):
+                    continue
+
+                yield {
+                    "title": item.get("title", ""),
+                    "company": company.title(),
+                    "url": item.get("applyUrl") or item.get("jobUrl", ""),
+                    "location": item.get("location", ""),
+                    "description": re.sub(
+                        r"<[^>]*>",
+                        " ",
+                        item.get("descriptionHtml") or ""
+                    ),
+                    "source": "Ashby"
+                }
+
+        except (requests.RequestException, ValueError) as exc:
+            print(f"Ashby {company} unavailable: {exc}")
+
 def score(job):
     title = job['title'].lower()
     description = job['description'].lower()
@@ -180,7 +210,7 @@ def score(job):
 
 def collect():
     found = []
-    for source in (fetch_remotive, fetch_arbeitnow, fetch_greenhouse):
+    for source in (fetch_remotive, fetch_arbeitnow, fetch_greenhouse, fetch_ashby):
         try:
             found.extend(source())
         except (requests.RequestException, ValueError) as exc:
