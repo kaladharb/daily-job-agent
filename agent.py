@@ -1,5 +1,7 @@
 import os
 import re
+import json
+
 import smtplib
 from datetime import datetime, timezone
 from email.message import EmailMessage
@@ -7,6 +9,27 @@ from html import escape
 from urllib.parse import urlparse
 
 import requests
+
+# Load resume-based job preferences
+with open("job_preferences.json", "r", encoding="utf-8") as file:
+    PREFERENCES = json.load(file)
+
+TARGET_ROLES = [
+    role.lower()
+    for role in PREFERENCES["target_roles"]
+]
+
+RESUME_SKILLS = [
+    skill.lower()
+    for skill in PREFERENCES["skills"]
+]
+
+PREFERRED_LOCATIONS = [
+    location.lower()
+    for location in PREFERENCES["preferred_locations"]
+]
+
+MAX_DAILY_JOBS = PREFERENCES["max_daily_jobs"]
 
 TIMEOUT = 20
 KEYWORDS = ('software', 'developer', 'engineer', 'python', 'frontend', 'front-end', 'backend', 'back-end', 'full stack', 'fullstack', 'machine learning', 'ai/ml', 'intern')
