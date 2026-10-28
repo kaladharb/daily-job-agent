@@ -63,6 +63,43 @@ def fetch_arbeitnow():
             'source': 'Arbeitnow',
         }
 
+def fetch_greenhouse():
+    with open("company_sources.json", "r", encoding="utf-8") as file:
+        sources = json.load(file)
+
+    for company in sources.get("greenhouse", []):
+        try:
+            url = (
+                "https://boards-api.greenhouse.io"
+                f"/v1/boards/{company}/jobs"
+            )
+
+            response = requests.get(
+                url,
+                params={"content": "true"},
+                timeout=TIMEOUT
+            )
+            response.raise_for_status()
+
+            for item in response.json().get("jobs", []):
+                location = item.get("location") or {}
+
+                yield {
+                    "title": item.get("title", ""),
+                    "company": company.title(),
+                    "url": item.get("absolute_url", ""),
+                    "location": location.get("name", ""),
+                    "description": re.sub(
+                        r"<[^>]*>",
+                        " ",
+                        item.get("content") or ""
+                    ),
+                    "source": "Greenhouse"
+                }
+
+        except (requests.RequestException, ValueError) as exc:
+            print(f"Greenhouse {company} unavailable: {exc}")
+
 
 def score(job):
     title = job['title'].lower()
@@ -117,7 +154,7 @@ def score(job):
 
 def collect():
     found = []
-    for source in (fetch_remotive, fetch_arbeitnow):
+    for source in (fetch_remotive, fetch_arbeitnow, fetch_greenhouse):
         try:
             found.extend(source())
         except (requests.RequestException, ValueError) as exc:
