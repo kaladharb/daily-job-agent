@@ -29,16 +29,6 @@ ROLE_GROUPS = {
     'Testing / QA': (12, ('software tester', 'qa engineer', 'quality assurance', 'manual tester', 'test engineer', 'testing intern', 'automation testing', 'qa intern', 'qa tester', 'software testing')),
 }
 
-ALLOWED_LOCATIONS = (
-    'india', 'hyderabad', 'bengaluru', 'bangalore', 'pune', 'chennai',
-    'mumbai', 'delhi', 'noida', 'gurgaon', 'gurugram', 'worldwide',
-    'anywhere', 'global',
-)
-RESTRICTED_LOCATIONS = (
-    'us only', 'usa only', 'united states only', 'europe only',
-    'eu only', 'uk only', 'canada only', 'emea only',
-)
-
 
 def fetch_remotive():
     response = requests.get(
