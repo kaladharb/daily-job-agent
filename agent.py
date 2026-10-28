@@ -248,19 +248,25 @@ def score(job):
     if '2027' in text:
         points += 5
 
-    # 11. Location preference (not a restriction)
-    india_locations = (
-        'india', 'hyderabad', 'bengaluru',
-        'bangalore', 'pune', 'chennai',
-        'mumbai', 'delhi'
+
+
+    # 11. Prioritize preferred cities without excluding other locations
+    priority_cities = (
+        'hyderabad',
+        'bengaluru',
+        'bangalore',
+        'chennai'
     )
 
-    if any(loc in location for loc in india_locations):
-        points += 8
-    elif any(loc in location for loc in (
+    if any(city in location for city in priority_cities):
+        points += 20
+    elif 'india' in location:
+        points += 10
+    elif any(term in location for term in (
         'worldwide', 'anywhere', 'global'
     )):
-        points += 4
+        points += 5
+
 
     # 12. Store useful job details
     job['category'] = max(
