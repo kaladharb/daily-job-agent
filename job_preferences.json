@@ -1,0 +1,55 @@
+
+{
+  "graduation_year": 2027,
+  "experience_level": [
+    "Internship",
+    "Fresher",
+    "Entry Level",
+    "Graduate",
+    "0-1 years"
+  ],
+  "target_roles": [
+    "Full Stack Developer",
+    "React Developer",
+    "Frontend Developer",
+    "Software Engineer",
+    "SDE Intern",
+    "Python Developer",
+    "Backend Developer",
+    "AI Engineer Intern",
+    "Machine Learning Intern",
+    "Generative AI Intern",
+    "Software Testing Intern",
+    "QA Intern"
+  ],
+  "skills": [
+    "Python",
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "Express.js",
+    "REST API",
+    "SQL",
+    "MySQL",
+    "MongoDB",
+    "Tailwind CSS",
+    "Git",
+    "RAG",
+    "LLM",
+    "LangChain"
+  ],
+  "preferred_locations": [
+    "Hyderabad",
+    "Bengaluru",
+    "Pune",
+    "Chennai",
+    "Mumbai",
+    "Delhi NCR",
+    "India",
+    "Remote India",
+    "Worldwide Remote"
+  ],
+  "max_daily_jobs": 50,
+  "prefer_direct_company_apply_links": true
+}
