@@ -1,6 +1,7 @@
 {
   "greenhouse": [
-    "stripe"
+    "stripe",
+    "greenhouse"
   ],
   "lever": []
 }
