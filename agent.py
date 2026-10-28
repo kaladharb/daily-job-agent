@@ -180,7 +180,7 @@ def score(job):
 
 def collect():
     found = []
-    ffor source in (fetch_remotive, fetch_arbeitnow, fetch_greenhouse, fetch_lever):
+    for source in (fetch_remotive, fetch_arbeitnow, fetch_greenhouse, fetch_lever):
         try:
             found.extend(source())
         except (requests.RequestException, ValueError) as exc:
