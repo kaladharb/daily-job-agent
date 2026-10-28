@@ -3,5 +3,7 @@
     "stripe",
     "greenhouse"
   ],
-  "lever": []
+  "lever": [
+    "posthog"
+  ]
 }
