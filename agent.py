@@ -122,10 +122,7 @@ def score(job):
     if re.search(r'\b(?:[3-9]|1[0-9])\+?\s*(?:years|yrs)\b', text[:1500]):
         return -1
 
-    if any(term in location for term in RESTRICTED_LOCATIONS):
-        return -1
-    if not any(term in location for term in ALLOWED_LOCATIONS):
-        return -1
+
 
     points = max(weight for _, weight in matched_groups)
     # Cap skill points so a long description does not dominate rankings.
