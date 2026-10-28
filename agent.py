@@ -101,6 +101,35 @@ def fetch_greenhouse():
             print(f"Greenhouse {company} unavailable: {exc}")
 
 
+def fetch_lever():
+    with open("company_sources.json", "r", encoding="utf-8") as file:
+        sources = json.load(file)
+
+    for company in sources.get("lever", []):
+        try:
+            url = f"https://api.lever.co/v0/postings/{company}"
+            response = requests.get(
+                url,
+                params={"mode": "json"},
+                timeout=TIMEOUT
+            )
+            response.raise_for_status()
+
+            for item in response.json():
+                categories = item.get("categories") or {}
+
+                yield {
+                    "title": item.get("text", ""),
+                    "company": company.title(),
+                    "url": item.get("applyUrl") or item.get("hostedUrl", ""),
+                    "location": categories.get("location", ""),
+                    "description": item.get("descriptionPlain", ""),
+                    "source": "Lever"
+                }
+
+        except (requests.RequestException, ValueError) as exc:
+            print(f"Lever {company} unavailable: {exc}")
+
 def score(job):
     title = job['title'].lower()
     description = job['description'].lower()
@@ -151,7 +180,7 @@ def score(job):
 
 def collect():
     found = []
-    for source in (fetch_remotive, fetch_arbeitnow, fetch_greenhouse):
+    ffor source in (fetch_remotive, fetch_arbeitnow, fetch_greenhouse, fetch_lever):
         try:
             found.extend(source())
         except (requests.RequestException, ValueError) as exc:
