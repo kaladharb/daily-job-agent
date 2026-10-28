@@ -51,21 +51,85 @@ def fetch_arbeitnow():
         yield {'title': item.get('title', ''), 'company': item.get('company_name', ''), 'url': item.get('url', ''), 'location': item.get('location', ''), 'description': re.sub('<[^>]*>', ' ', item.get('description', '')), 'source': 'Arbeitnow'}
 
 
+
 def score(job):
     title = job['title'].lower()
-    text = (job['title'] + ' ' + job['description']).lower()
+    description = job['description'].lower()
+    text = title + ' ' + description
     location = job['location'].lower()
-    if not any(word in title for word in KEYWORDS) or any(word in title for word in EXCLUDE):
+
+    # Reject senior-level roles
+    if any(word in title for word in EXCLUDE):
         return -1
-    if re.search(r'\b(?:[3-9]|1[0-9])\+?\s*(?:years|yrs)\b', text[:1200]):
+
+    # Check target job roles
+    role_keywords = (
+        'software', 'sde', 'developer', 'engineer',
+        'frontend', 'front-end', 'backend', 'back-end',
+        'full stack', 'fullstack', 'python', 'react',
+        'machine learning', 'ai', 'data scientist',
+        'quality assurance', 'qa', 'testing', 'tester'
+    )
+
+    if not any(word in title for word in role_keywords):
         return -1
-    if any(term in location for term in ('us only', 'usa only', 'united states only', 'europe only', 'eu only')):
+
+    # Reject roles requiring 3+ years of experience
+    if re.search(
+        r'\b(?:[3-9]|1[0-9])\+?\s*(?:years|yrs)\b',
+        text[:1500]
+    ):
         return -1
-    points = sum(2 for skill in SKILLS if skill in text)
-    points += 7 if 'intern' in title else 0
-    points += 5 if any(term in text for term in ('entry level', 'entry-level', 'graduate', 'fresher', 'junior', 'new grad')) else 0
-    points += 2 if any(term in location for term in ('india', 'worldwide', 'anywhere', 'remote', 'global')) else 0
+
+    # Prioritize India and worldwide remote roles
+    allowed_locations = (
+        'india', 'hyderabad', 'bengaluru',
+        'bangalore', 'pune', 'chennai',
+        'mumbai', 'delhi', 'noida',
+        'gurgaon', 'gurugram',
+        'worldwide', 'anywhere', 'global'
+    )
+
+    if not any(loc in location for loc in allowed_locations):
+        return -1
+
+    points = 0
+
+    # Resume skill matching
+    for skill in RESUME_SKILLS:
+        if skill in text:
+            points += 3
+
+    # Match selected job roles
+    for role in TARGET_ROLES:
+        if role in title:
+            points += 8
+
+    # Prefer internships
+    if 'intern' in title:
+        points += 12
+
+    # Prefer entry-level positions
+    if any(term in text for term in (
+        'entry level', 'entry-level',
+        'fresher', 'new grad',
+        'graduate', 'junior'
+    )):
+        points += 7
+
+    # Prefer 2027-eligible positions
+    if '2027' in text:
+        points += 10
+
+    # Prefer Indian locations
+    if any(loc in location for loc in (
+        'india', 'hyderabad', 'bengaluru',
+        'bangalore', 'pune', 'chennai'
+    )):
+        points += 5
+
     return points
+
 
 
 def collect():
@@ -83,7 +147,7 @@ def collect():
         job['score'] = score(job)
         if job['score'] >= 3:
             unique[url.split('?')[0].rstrip('/')] = job
-    return sorted(unique.values(), key=lambda job: job['score'], reverse=True)[:50]
+    return sorted(unique.values(), key=lambda job: job['score'], reverse=True)[:MAX_DAILY_JOBS]
 
 
 def format_report(jobs):
